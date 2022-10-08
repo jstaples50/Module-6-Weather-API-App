@@ -11,7 +11,10 @@
 // THEN I am again presented with current and future conditions for that city
 
 
-var testURL = 'https://api.openweathermap.org/data/2.5/onecall?lat=39.7684&lon=86.1581&appid=676b29ebdec0b216ef87ee50996c4273'
+var weatherAPIKey = '4c8c4f602c00e61fcabd2b0efc3a138f'
+var lat = 39.7684
+var lon = 86.1581
+var testURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherAPIKey}`
 
 fetch(testURL)
     .then(function (response) {

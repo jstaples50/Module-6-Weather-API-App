@@ -10,16 +10,76 @@
 // WHEN I click on a city in the search history
 // THEN I am again presented with current and future conditions for that city
 
+// **GLOBAL VARIABLES**
 
-var weatherAPIKey = '4c8c4f602c00e61fcabd2b0efc3a138f'
-var lat = 39.7684
-var lon = 86.1581
-var testURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${weatherAPIKey}`
+var apiKey = '4c8c4f602c00e61fcabd2b0efc3a138f'
+var lat = 39.778166251060085
+var lon = -86.15738136464999
+var currentDay = moment().format('L')
 
-fetch(testURL)
+// Source for Icons
+// http://openweathermap.org/img/wn/{icon id}@2x.png
+
+var iconImgUrl = '';
+var iconImgEl = document.createElement('img');
+
+var cityNameAndDate = 'Default City (Indianpolis)';
+var cityNameAndDateEl = document.createElement('h2');
+
+var cloudCover = '';
+var cloudCoverEl = document.createElement('h3');
+cloudCoverEl.setAttribute('id', 'cloud-cover');
+
+var temp = '';
+var tempEl = document.createElement('p');
+
+var wind = '';
+var windEl = document.createElement('p');
+
+var humidity = '';
+var humidityEl = document.createElement('p');
+
+var weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
+var forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
+
+// **FUNCTIONS**
+
+function mainCityApiCall(url) {
+    fetch(url)
     .then(function (response) {
         return response.json();
     })
     .then (function (data) {
         console.log(data)
+        cityNameAndDate = `${data.name} ${currentDay}`;
+        $(cityNameAndDateEl).text(cityNameAndDate);
+        $('#city-weather').append(cityNameAndDateEl);
+
+        iconImgUrl = `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+        iconImgEl.setAttribute('src', iconImgUrl);
+        $('#city-weather').append(iconImgEl);
+
+        cloudCover = data.weather[0].description;
+        $(cloudCoverEl).text(cloudCover);
+        $('#city-weather').append(cloudCoverEl);
+
+        temp = `Temp: ${data.main.temp}°F`;
+        $(tempEl).text(temp);
+        $('#city-weather').append(tempEl);
+
+        wind = `Wind: ${data.wind.speed} MPH`;
+        $(windEl).text(wind);
+        $('#city-weather').append(windEl);
+
+        humidity = `Humidity: ${data.main.humidity} %`;
+        $(humidityEl).text(humidity);
+        $('#city-weather').append(humidityEl);
     }); 
+}
+
+// **TESTS**
+
+
+// **EXECUTION**
+
+mainCityApiCall(weatherURL);

@@ -1,0 +1,8 @@
+
+#city-weather {
+    border: 2px solid black;
+}
+
+#cloud-cover {
+    text-transform: capitalize;
+}

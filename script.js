@@ -12,10 +12,13 @@
 
 // **GLOBAL VARIABLES**
 
-var apiKey = '4c8c4f602c00e61fcabd2b0efc3a138f'
-var lat = 39.778166251060085
-var lon = -86.15738136464999
-var currentDay = moment().format('L')
+var apiKey = '4c8c4f602c00e61fcabd2b0efc3a138f';
+var lat = 39.778166251060085;
+var lon = -86.15738136464999;
+
+var currentDayMonthYear = moment().format('L');
+var currentDate = moment().format('YYYY-MM-DD');
+var noon = '12:00:00'
 
 // Source for Icons
 // http://openweathermap.org/img/wn/{icon id}@2x.png
@@ -51,7 +54,7 @@ function mainCityApiCall(url) {
     })
     .then (function (data) {
         console.log(data)
-        cityNameAndDate = `${data.name} ${currentDay}`;
+        cityNameAndDate = `${data.name} ${currentDayMonthYear}`;
         $(cityNameAndDateEl).text(cityNameAndDate);
         $('#city-weather').append(cityNameAndDateEl);
 
@@ -71,15 +74,52 @@ function mainCityApiCall(url) {
         $(windEl).text(wind);
         $('#city-weather').append(windEl);
 
-        humidity = `Humidity: ${data.main.humidity} %`;
+        humidity = `Humidity: ${data.main.humidity}%`;
         $(humidityEl).text(humidity);
         $('#city-weather').append(humidityEl);
     }); 
 }
 
-// **TESTS**
+function fiveDayForecastApiCall(url) {
+    var dataCheck = 1;
+    fetch(url)
+    .then(function (response) {
+        return response.json();
+    })
+    .then (function (data) {
+        var fiveDayForecast = document.createElement('h2');
+        $(fiveDayForecast).text('5-Day Forecast');
+        $('#five-day-forecast').append(fiveDayForecast);
 
+        // Loop to check if data is not today, and if data is for noon
+
+        for(var i = 0; i < data.list.length; i++) {
+            if (!data.list[i].dt_txt.includes(currentDate) 
+                && data.list[i].dt_txt.includes(noon)) {
+
+                console.log(`${dataCheck} ${data.list[i]}`);
+
+                var dayCard = document.createElement('div');
+                $(dayCard).addClass('card');
+                $('#five-day-forecast').append(dayCard);
+
+                // Sets the unix variable from data and formats it
+                var unixVariable = data.list[i].dt;
+                var indexDate = moment(unixVariable * 1000).format('MM/DD/YYYY');
+                var indexDateEl = document.createElement('p');
+                $(indexDateEl).text(indexDate);
+                $(dayCard).append(indexDateEl);
+            }
+            dataCheck++;
+        }
+        console.log(data);
+    })
+}
+
+// **TESTS**
 
 // **EXECUTION**
 
 mainCityApiCall(weatherURL);
+fiveDayForecastApiCall(forecastURL);
+

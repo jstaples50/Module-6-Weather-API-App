@@ -6,3 +6,7 @@
 #cloud-cover {
     text-transform: capitalize;
 }
+
+#five-day-forecast {
+    border: 2px solid black;
+}

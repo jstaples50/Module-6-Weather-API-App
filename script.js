@@ -16,6 +16,10 @@ var apiKey = '4c8c4f602c00e61fcabd2b0efc3a138f';
 var lat = 39.778166251060085;
 var lon = -86.15738136464999;
 
+var searchBtnEl = $('#search-btn');
+$(searchBtnEl).on('click', renderWeather);
+
+
 var currentDayMonthYear = moment().format('L');
 var currentDate = moment().format('YYYY-MM-DD');
 var noon = '12:00:00'
@@ -31,7 +35,7 @@ var cityNameAndDateEl = document.createElement('h2');
 
 var cloudCover = '';
 var cloudCoverEl = document.createElement('h3');
-cloudCoverEl.setAttribute('id', 'cloud-cover');
+cloudCoverEl.setAttribute('class', 'cloud-cover');
 
 var temp = '';
 var tempEl = document.createElement('p');
@@ -46,6 +50,8 @@ var weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon
 var forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
 
 // **FUNCTIONS**
+
+
 
 function mainCityApiCall(url) {
     fetch(url)
@@ -97,18 +103,48 @@ function fiveDayForecastApiCall(url) {
             if (!data.list[i].dt_txt.includes(currentDate) 
                 && data.list[i].dt_txt.includes(noon)) {
 
-                console.log(`${dataCheck} ${data.list[i]}`);
+                console.log(`${dataCheck} ${data.list[i].main}`);
 
                 var dayCard = document.createElement('div');
                 $(dayCard).addClass('card');
                 $('#five-day-forecast').append(dayCard);
 
                 // Sets the unix variable from data and formats it
+
                 var unixVariable = data.list[i].dt;
                 var indexDate = moment(unixVariable * 1000).format('MM/DD/YYYY');
-                var indexDateEl = document.createElement('p');
+                var indexDateEl = document.createElement('h3');
                 $(indexDateEl).text(indexDate);
                 $(dayCard).append(indexDateEl);
+
+                // Cloud cover for 5 day
+
+                var fiveDayCloudCover = data.list[i].weather[0].description;
+                var fiveDayCloudCoverEl = document.createElement('p');
+                fiveDayCloudCoverEl.setAttribute('class', 'cloud-cover')
+                $(fiveDayCloudCoverEl).text(fiveDayCloudCover);
+                $(dayCard).append(fiveDayCloudCoverEl);
+
+                // Temp for 5 day
+
+                var fiveDayTemp = `Temp: ${data.list[i].main.temp}°F`;
+                var fiveDayTempEl = document.createElement('p');
+                $(fiveDayTempEl).text(fiveDayTemp);
+                $(dayCard).append(fiveDayTempEl);
+
+                // Wind for 5 day
+
+                var fiveDayWind = `Wind: ${data.list[i].wind.speed} MPH`;
+                var fiveDayWindEl = document.createElement('p');
+                $(fiveDayWindEl).text(fiveDayWind);
+                $(dayCard).append(fiveDayWindEl);
+
+                // Humidity for 5 day
+
+                var fiveDayHumidity = `Humidity: ${data.list[i].main.humidity}%`;
+                var fiveDayHumidityEl = document.createElement('p');
+                $(fiveDayHumidityEl).text(fiveDayHumidity);
+                $(dayCard).append(fiveDayHumidityEl);
             }
             dataCheck++;
         }
@@ -116,10 +152,21 @@ function fiveDayForecastApiCall(url) {
     })
 }
 
+function renderWeather(event) {
+    event.preventDefault();
+    console.log('click');
+    mainCityApiCall(weatherURL);
+    fiveDayForecastApiCall(forecastURL);
+}
+
 // **TESTS**
-var testCommit = 'test from Karley';
+
+var fiveDayTest = $('#five-day-forecast')
+$(fiveDayTest).css('height:100px;')
+console.log($(searchBtnEl).text());
+
 // **EXECUTION**
 
-mainCityApiCall(weatherURL);
-fiveDayForecastApiCall(forecastURL);
+// mainCityApiCall(weatherURL);
+// fiveDayForecastApiCall(forecastURL);
 

@@ -3,7 +3,7 @@
     border: 2px solid black;
 }
 
-#cloud-cover {
+.cloud-cover {
     text-transform: capitalize;
 }
 

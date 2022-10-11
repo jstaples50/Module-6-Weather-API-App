@@ -117,7 +117,7 @@ function fiveDayForecastApiCall(url) {
 }
 
 // **TESTS**
-
+var testCommit = 'test from Karley';
 // **EXECUTION**
 
 mainCityApiCall(weatherURL);

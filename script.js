@@ -13,6 +13,7 @@
 // **GLOBAL VARIABLES**
 
 var apiKey = '4c8c4f602c00e61fcabd2b0efc3a138f';
+// var cityName;
 var lat = 39.778166251060085;
 var lon = -86.15738136464999;
 
@@ -46,12 +47,22 @@ var windEl = document.createElement('p');
 var humidity = '';
 var humidityEl = document.createElement('p');
 
-var weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
-var forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
+// var weatherURL;
+// var weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
+
+// var forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
+
+
 
 // **FUNCTIONS**
 
-
+// function getCityCoordinates() {
+//     var cityName = $('#city-search').val();
+//     var stateName = 'in';
+//     var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
+//     // var forecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${cityName},${stateName},us&units=imperialappid=${apiKey}`
+//     locationTest(geolocationURL);
+// }
 
 function mainCityApiCall(url) {
     fetch(url)
@@ -155,18 +166,31 @@ function fiveDayForecastApiCall(url) {
 function renderWeather(event) {
     event.preventDefault();
     console.log('click');
+    var cityName = $('#city-search').val();
+    var stateName = 'in';
+    var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
+    var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
+
     mainCityApiCall(weatherURL);
-    fiveDayForecastApiCall(forecastURL);
+    fiveDayForecastApiCall(forecastByCityURL);
+    $(searchBtnEl).off();
 }
 
 // **TESTS**
 
-var fiveDayTest = $('#five-day-forecast')
-$(fiveDayTest).css('height:100px;')
-console.log($(searchBtnEl).text());
+function locationTest(url) {
+    fetch(url)
+    .then(function (response) {
+        return response.json();
+    })
+    .then (function (data) {
+        console.log(data)
+    })
+}
 
 // **EXECUTION**
 
 // mainCityApiCall(weatherURL);
 // fiveDayForecastApiCall(forecastURL);
 
+// locationTest(geolocationURL);

@@ -14,6 +14,9 @@
 
 var apiKey = '4c8c4f602c00e61fcabd2b0efc3a138f';
 
+// Variable to check for errors
+
+var errorFound = false;
 
 var searchBtnEl = $('#search-btn');
 $(searchBtnEl).on('click', renderWeather);
@@ -71,7 +74,6 @@ for (var i = 0; i < stateAbbreviations.length; i++) {
 }
 
 
-
 // **FUNCTIONS**
 
 function renderWeather(event) {
@@ -86,13 +88,18 @@ function renderWeather(event) {
 
     mainCityApiCall(weatherURL);
     fiveDayForecastApiCall(forecastByCityURL);
-    
-    var savedOptionEl = document.createElement('p')
-    $(savedOptionEl).addClass('saved-btn');
-    $(savedOptionEl).text(cityName);
-    $('#saved-searches').append(savedOptionEl);
-    cityKeyPair[`${cityName}`] = [`${cityName}`, `${stateName}`];
-    localStorage.setItem('cityKeyPair', JSON.stringify(cityKeyPair));
+    checkErrorAndRenderSaved();
+
+    function checkErrorAndRenderSaved() {
+        if (errorFound === false) {
+            var savedOptionEl = document.createElement('p')
+            $(savedOptionEl).addClass('saved-btn');
+            $(savedOptionEl).text(cityName);
+            $('#saved-searches').append(savedOptionEl);
+            cityKeyPair[`${cityName}`] = [`${cityName}`, `${stateName}`];
+            localStorage.setItem('cityKeyPair', JSON.stringify(cityKeyPair));
+        }
+    }
 }
 
 function rememberWeather(event) {
@@ -116,9 +123,10 @@ function rememberWeather(event) {
 function mainCityApiCall(url) {
     fetch(url)
     .then(function (response) {
-        if (response.ok) {
+        if (response.status !== '404') {
             return response.json();
         } else {
+            errorFound = true;
             var errorEl = document.createElement('p')
             $(errorEl).text('Enter Valid City Name')
             $('#city-weather').append(errorEl);
@@ -251,4 +259,5 @@ function locationTest(url) {
 
 // **EXECUTION**
 
+console.log(errorFound);
 getLocalStorage();

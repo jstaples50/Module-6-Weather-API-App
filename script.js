@@ -20,6 +20,14 @@ $(searchBtnEl).on('click', renderWeather);
 
 $('#saved-searches').on('click', rememberWeather);
 
+// Local Storage
+
+if (localStorage.getItem('cityKeyPair') !== null) {
+    var cityKeyPair = JSON.parse(localStorage.getItem('cityKeyPair'));
+} else {
+    var cityKeyPair = {};
+}
+
 
 var currentDayMonthYear = moment().format('L');
 var currentDate = moment().format('YYYY-MM-DD');
@@ -47,7 +55,7 @@ var windEl = document.createElement('p');
 var humidity = '';
 var humidityEl = document.createElement('p');
 
-// var weatherURL;
+
 // var weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
 
 // var forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
@@ -63,20 +71,59 @@ for (var i = 0; i < stateAbbreviations.length; i++) {
 }
 
 
+
 // **FUNCTIONS**
 
-// function getCityCoordinates() {
-//     var cityName = $('#city-search').val();
-//     var stateName = 'in';
-//     var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
-//     // var forecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${cityName},${stateName},us&units=imperialappid=${apiKey}`
-//     locationTest(geolocationURL);
-// }
+function renderWeather(event) {
+    $('#city-weather').empty();
+    $('#five-day-forecast').empty();
+    event.preventDefault();
+    console.log('click');
+    var cityName = $('#city-search').val();
+    var stateName = $('#state-search').val().toLowerCase();
+    var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
+    var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
+
+    mainCityApiCall(weatherURL);
+    fiveDayForecastApiCall(forecastByCityURL);
+    
+    var savedOptionEl = document.createElement('p')
+    $(savedOptionEl).addClass('saved-btn');
+    $(savedOptionEl).text(cityName);
+    $('#saved-searches').append(savedOptionEl);
+    cityKeyPair[`${cityName}`] = [`${cityName}`, `${stateName}`];
+    localStorage.setItem('cityKeyPair', JSON.stringify(cityKeyPair));
+}
+
+function rememberWeather(event) {
+    if(event.target.textContent !== null) {
+        $('#city-weather').empty();
+        $('#five-day-forecast').empty();
+        event.preventDefault();
+        console.log('click');
+        cityName = event.target.textContent;
+        stateName = cityKeyPair[`${cityName}`][1];
+        console.log(stateName);
+
+        var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
+        var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
+
+        mainCityApiCall(weatherURL);
+        fiveDayForecastApiCall(forecastByCityURL);
+    } 
+}
 
 function mainCityApiCall(url) {
     fetch(url)
     .then(function (response) {
-        return response.json();
+        if (response.ok) {
+            return response.json();
+        } else {
+            var errorEl = document.createElement('p')
+            $(errorEl).text('Enter Valid City Name')
+            $('#city-weather').append(errorEl);
+            throw new Error('Something went wrong');
+        }
     })
     .then (function (data) {
         console.log(data)
@@ -110,7 +157,11 @@ function fiveDayForecastApiCall(url) {
     var dataCheck = 1;
     fetch(url)
     .then(function (response) {
+        if (response.ok) {
         return response.json();
+        } else {
+            throw new Error('Something went wrong');
+        }
     })
     .then (function (data) {
         var fiveDayForecast = document.createElement('h2');
@@ -172,45 +223,19 @@ function fiveDayForecastApiCall(url) {
     })
 }
 
-function renderWeather(event) {
-    $('#city-weather').empty();
-    $('#five-day-forecast').empty();
-    event.preventDefault();
-    console.log('click');
-    var cityName = $('#city-search').val();
-    var stateName = $('#state-search').val().toLowerCase();
-    var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
-    var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
-
-    mainCityApiCall(weatherURL);
-    fiveDayForecastApiCall(forecastByCityURL);
-    
-    var savedOptionEl = document.createElement('p')
-    // $(savedOptionEl).on('click', rememberWeather);
-    $(savedOptionEl).addClass('saved-btn');
-    $(savedOptionEl).text(cityName);
-    $('#saved-searches').append(savedOptionEl);
-    savedCityandState = [`${cityName}, ${stateName}`];
-    localStorage.setItem(`${cityName}`, savedCityandState);
-}
-
-function rememberWeather(event) {
-    if(event.target.textContent !== null) {
-        $('#city-weather').empty();
-        $('#five-day-forecast').empty();
-        event.preventDefault();
-        console.log('click');
-        cityName = event.target.textContent;
-        savedPair = localStorage.getItem(`${cityName}`);
-        console.log(savedPair);
-        stateName = savedPair[1];
-        var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
-        var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
-
-        mainCityApiCall(weatherURL);
-        fiveDayForecastApiCall(forecastByCityURL);
-    } 
-}
+function getLocalStorage() {
+    if (localStorage.getItem('cityKeyPair') !== null) {
+        console.log(cityKeyPair.length);
+        keys = Object.entries(cityKeyPair)[0];
+        for (var i = 0; i < Object.entries(cityKeyPair).length; i++) {
+            var savedOptionEl = document.createElement('p')
+            $(savedOptionEl).addClass('saved-btn');
+            var cityText = keys[i];
+            $(savedOptionEl).text(cityText);
+            $('#saved-searches').append(savedOptionEl);
+        }
+    }  
+} 
 
 // **TESTS**
 
@@ -226,7 +251,4 @@ function locationTest(url) {
 
 // **EXECUTION**
 
-// mainCityApiCall(weatherURL);
-// fiveDayForecastApiCall(forecastURL);
-
-// locationTest(geolocationURL);
+getLocalStorage();

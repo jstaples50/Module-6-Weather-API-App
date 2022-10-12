@@ -10,3 +10,11 @@
 #five-day-forecast {
     border: 2px solid black;
 }
+
+.saved-btn {
+    border: 1px dashed blue;
+}
+
+.saved-btn:hover {
+    cursor: pointer;
+}

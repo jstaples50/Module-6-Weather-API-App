@@ -13,12 +13,12 @@
 // **GLOBAL VARIABLES**
 
 var apiKey = '4c8c4f602c00e61fcabd2b0efc3a138f';
-// var cityName;
-var lat = 39.778166251060085;
-var lon = -86.15738136464999;
+
 
 var searchBtnEl = $('#search-btn');
 $(searchBtnEl).on('click', renderWeather);
+
+$('#saved-searches').on('click', rememberWeather);
 
 
 var currentDayMonthYear = moment().format('L');
@@ -52,6 +52,15 @@ var humidityEl = document.createElement('p');
 
 // var forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
 
+var stateAbbreviations = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
+
+// Create state datalist
+
+for (var i = 0; i < stateAbbreviations.length; i++) {
+    var optionEl = document.createElement('option');
+    optionEl.value = stateAbbreviations[i];
+    $('#state-options').append(optionEl);
+}
 
 
 // **FUNCTIONS**
@@ -164,16 +173,43 @@ function fiveDayForecastApiCall(url) {
 }
 
 function renderWeather(event) {
+    $('#city-weather').empty();
+    $('#five-day-forecast').empty();
     event.preventDefault();
     console.log('click');
     var cityName = $('#city-search').val();
-    var stateName = 'in';
+    var stateName = $('#state-search').val().toLowerCase();
     var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
     var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
 
     mainCityApiCall(weatherURL);
     fiveDayForecastApiCall(forecastByCityURL);
-    $(searchBtnEl).off();
+    
+    var savedOptionEl = document.createElement('p')
+    // $(savedOptionEl).on('click', rememberWeather);
+    $(savedOptionEl).addClass('saved-btn');
+    $(savedOptionEl).text(cityName);
+    $('#saved-searches').append(savedOptionEl);
+    savedCityandState = [`${cityName}, ${stateName}`];
+    localStorage.setItem(`${cityName}`, savedCityandState);
+}
+
+function rememberWeather(event) {
+    if(event.target.textContent !== null) {
+        $('#city-weather').empty();
+        $('#five-day-forecast').empty();
+        event.preventDefault();
+        console.log('click');
+        cityName = event.target.textContent;
+        savedPair = localStorage.getItem(`${cityName}`);
+        console.log(savedPair);
+        stateName = savedPair[1];
+        var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
+        var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
+
+        mainCityApiCall(weatherURL);
+        fiveDayForecastApiCall(forecastByCityURL);
+    } 
 }
 
 // **TESTS**

@@ -14,20 +14,20 @@
 
     <div class="city-input-field" >
         <label for="city-search">Enter City:</label>
-        <input type="text" id="city-search" name="q" placeholder="city here">
+        <input type="text" id="city-search" name="q" placeholder="Enter City">
         <button id="search-btn">Search</button>
     </div>
     <div class="state-input-field" >
         <label for="state-search">Enter State:</label>
-        <input type="text" id="state-search" name="q" placeholder="state here">
+        <input list="state-options" id="state-search" name="q" placeholder="Pick State">
     </div>
+    <datalist id="state-options"></datalist>
+
+    <div id="saved-searches"></div>
 
     <div id="city-weather"></div>
     
-    <div id="five-day-forecast">
-        <div class="card"></div>
-
-    </div>
+    <div id="five-day-forecast"></div>
 
 
     <script

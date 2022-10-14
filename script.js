@@ -31,6 +31,7 @@ if (localStorage.getItem('cityKeyPair') !== null) {
     var cityKeyPair = {};
 }
 
+// Current Weather Variables
 
 var currentDayMonthYear = moment().format('L');
 var currentDate = moment().format('YYYY-MM-DD');
@@ -58,6 +59,11 @@ var windEl = document.createElement('p');
 var humidity = '';
 var humidityEl = document.createElement('p');
 
+// Render Weather Variables
+
+var renderCityName;
+var renderStateName;
+
 
 // var weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
 
@@ -81,49 +87,50 @@ function renderWeather(event) {
     $('#five-day-forecast').empty();
     event.preventDefault();
     console.log('click');
-    var cityName = $('#city-search').val();
-    var stateName = $('#state-search').val().toLowerCase();
-    var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
-    var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
+    renderCityName = $('#city-search').val();
+    renderStateName = $('#state-search').val().toLowerCase();
+    var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${renderCityName},${renderStateName},us&units=imperial&appid=${apiKey}`
+    var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${renderCityName},${renderStateName},us&units=imperial&appid=${apiKey}`
 
     mainCityApiCall(weatherURL);
     fiveDayForecastApiCall(forecastByCityURL);
-    checkErrorAndRenderSaved();
-
-    function checkErrorAndRenderSaved() {
-        if (errorFound === false) {
-            var savedOptionEl = document.createElement('p')
-            $(savedOptionEl).addClass('saved-btn');
-            $(savedOptionEl).text(cityName);
-            $('#saved-searches').append(savedOptionEl);
-            cityKeyPair[`${cityName}`] = [`${cityName}`, `${stateName}`];
-            localStorage.setItem('cityKeyPair', JSON.stringify(cityKeyPair));
-        }
-    }
 }
 
 function rememberWeather(event) {
     if(event.target.textContent !== null) {
         $('#city-weather').empty();
         $('#five-day-forecast').empty();
+        renderCityName = undefined;
         event.preventDefault();
         console.log('click');
-        cityName = event.target.textContent;
-        stateName = cityKeyPair[`${cityName}`][1];
-        console.log(stateName);
+        rememberCityName = event.target.textContent;
+        rememberStateName = cityKeyPair[`${rememberCityName}`][1];
+        console.log(rememberStateName);
 
-        var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
-        var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${cityName},${stateName},us&units=imperial&appid=${apiKey}`
+        var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${rememberCityName},${rememberStateName},us&units=imperial&appid=${apiKey}`
+        var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${rememberCityName},${rememberStateName},us&units=imperial&appid=${apiKey}`
 
         mainCityApiCall(weatherURL);
         fiveDayForecastApiCall(forecastByCityURL);
     } 
 }
 
+function checkErrorAndRenderSaved() {
+    if (errorFound === false && renderCityName !== undefined) {
+        console.log(errorFound);
+        var savedOptionEl = document.createElement('p')
+        $(savedOptionEl).addClass('saved-btn');
+        $(savedOptionEl).text(renderCityName);
+        $('#saved-searches').append(savedOptionEl);
+        cityKeyPair[`${renderCityName}`] = [`${renderCityName}`, `${renderStateName}`];
+        localStorage.setItem('cityKeyPair', JSON.stringify(cityKeyPair));
+    }
+}
+
 function mainCityApiCall(url) {
     fetch(url)
     .then(function (response) {
-        if (response.status !== '404') {
+        if (response.ok) {
             return response.json();
         } else {
             errorFound = true;
@@ -135,6 +142,9 @@ function mainCityApiCall(url) {
     })
     .then (function (data) {
         console.log(data)
+
+        checkErrorAndRenderSaved();
+
         cityNameAndDate = `${data.name} ${currentDayMonthYear}`;
         $(cityNameAndDateEl).text(cityNameAndDate);
         $('#city-weather').append(cityNameAndDateEl);
@@ -259,5 +269,4 @@ function locationTest(url) {
 
 // **EXECUTION**
 
-console.log(errorFound);
 getLocalStorage();

@@ -19,7 +19,8 @@ var apiKey = '4c8c4f602c00e61fcabd2b0efc3a138f';
 var errorFound = false;
 
 var searchBtnEl = $('#search-btn');
-$(searchBtnEl).on('click', renderWeather);
+$(searchBtnEl).on('click' , renderWeather);
+$('#state-search').on()
 
 $('#saved-searches').on('click', rememberWeather);
 
@@ -89,6 +90,7 @@ function renderWeather(event) {
     console.log('click');
     renderCityName = $('#city-search').val();
     renderStateName = $('#state-search').val().toLowerCase();
+
     var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${renderCityName},${renderStateName},us&units=imperial&appid=${apiKey}`
     var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${renderCityName},${renderStateName},us&units=imperial&appid=${apiKey}`
 
@@ -97,14 +99,16 @@ function renderWeather(event) {
 }
 
 function rememberWeather(event) {
-    if(event.target.textContent !== null) {
+    if(event.target.textContent !== undefined) {
         $('#city-weather').empty();
         $('#five-day-forecast').empty();
-        renderCityName = undefined;
+
+        // renderCityName = undefined;
+        
         event.preventDefault();
         console.log('click');
-        rememberCityName = event.target.textContent;
-        rememberStateName = cityKeyPair[`${rememberCityName}`][1];
+        var rememberCityName = event.target.textContent;
+        var rememberStateName = cityKeyPair[`${rememberCityName}`][1];
         console.log(rememberStateName);
 
         var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${rememberCityName},${rememberStateName},us&units=imperial&appid=${apiKey}`
@@ -116,7 +120,7 @@ function rememberWeather(event) {
 }
 
 function checkErrorAndRenderSaved() {
-    if (errorFound === false && renderCityName !== undefined) {
+    if (errorFound === false) {
         console.log(errorFound);
         var savedOptionEl = document.createElement('p')
         $(savedOptionEl).addClass('saved-btn');
@@ -127,7 +131,9 @@ function checkErrorAndRenderSaved() {
     }
 }
 
+
 function mainCityApiCall(url) {
+    errorFound = false;
     fetch(url)
     .then(function (response) {
         if (response.ok) {
@@ -143,7 +149,20 @@ function mainCityApiCall(url) {
     .then (function (data) {
         console.log(data)
 
-        checkErrorAndRenderSaved();
+        var checkKeys;
+        if (!cityKeyPair) {
+            checkKeys = false;
+        } else if (cityKeyPair) {
+            checkKeys = Object.entries(cityKeyPair)[0]
+            console.log(checkKeys);
+        }
+
+        if (!checkKeys) {
+            checkErrorAndRenderSaved();
+        } else if (!Object.entries(cityKeyPair)[0].includes(event.target.textContent)) {
+            console.log(checkKeys)
+            checkErrorAndRenderSaved();
+        }
 
         cityNameAndDate = `${data.name} ${currentDayMonthYear}`;
         $(cityNameAndDateEl).text(cityNameAndDate);

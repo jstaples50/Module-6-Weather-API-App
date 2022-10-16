@@ -94,12 +94,16 @@ function renderWeather(event) {
     var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${renderCityName},${renderStateName},us&units=imperial&appid=${apiKey}`
     var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${renderCityName},${renderStateName},us&units=imperial&appid=${apiKey}`
 
-    mainCityApiCall(weatherURL);
+    submitMainCityApiCall(weatherURL);
     fiveDayForecastApiCall(forecastByCityURL);
 }
 
 function rememberWeather(event) {
-    if(event.target.textContent !== undefined) {
+    // if(event.target.textContent !== null)
+
+    // var clickedTarget = event.target.textContent
+
+    if(event.target.matches('p')) {
         $('#city-weather').empty();
         $('#five-day-forecast').empty();
 
@@ -114,25 +118,23 @@ function rememberWeather(event) {
         var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${rememberCityName},${rememberStateName},us&units=imperial&appid=${apiKey}`
         var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${rememberCityName},${rememberStateName},us&units=imperial&appid=${apiKey}`
 
-        mainCityApiCall(weatherURL);
+        rememberMainCityApiCall(weatherURL);
         fiveDayForecastApiCall(forecastByCityURL);
-    } 
+    } else {
+        throw new Error('Inbetween Buttons')
+    }
 }
 
-function checkErrorAndRenderSaved() {
-    if (errorFound === false) {
-        console.log(errorFound);
+function submitCheckErrorAndRenderSaved() {
         var savedOptionEl = document.createElement('p')
         $(savedOptionEl).addClass('saved-btn');
         $(savedOptionEl).text(renderCityName);
         $('#saved-searches').append(savedOptionEl);
         cityKeyPair[`${renderCityName}`] = [`${renderCityName}`, `${renderStateName}`];
         localStorage.setItem('cityKeyPair', JSON.stringify(cityKeyPair));
-    }
 }
 
-
-function mainCityApiCall(url) {
+function submitMainCityApiCall(url) {
     errorFound = false;
     fetch(url)
     .then(function (response) {
@@ -140,6 +142,9 @@ function mainCityApiCall(url) {
             return response.json();
         } else {
             errorFound = true;
+            
+            console.log(`1st ${errorFound}`)
+
             var errorEl = document.createElement('p')
             $(errorEl).text('Enter Valid City Name')
             $('#city-weather').append(errorEl);
@@ -148,21 +153,6 @@ function mainCityApiCall(url) {
     })
     .then (function (data) {
         console.log(data)
-
-        var checkKeys;
-        if (!cityKeyPair) {
-            checkKeys = false;
-        } else if (cityKeyPair) {
-            checkKeys = Object.entries(cityKeyPair)[0]
-            console.log(checkKeys);
-        }
-
-        if (!checkKeys) {
-            checkErrorAndRenderSaved();
-        } else if (!Object.entries(cityKeyPair)[0].includes(event.target.textContent)) {
-            console.log(checkKeys)
-            checkErrorAndRenderSaved();
-        }
 
         cityNameAndDate = `${data.name} ${currentDayMonthYear}`;
         $(cityNameAndDateEl).text(cityNameAndDate);
@@ -187,7 +177,56 @@ function mainCityApiCall(url) {
         humidity = `Humidity: ${data.main.humidity}%`;
         $(humidityEl).text(humidity);
         $('#city-weather').append(humidityEl);
-    }); 
+
+        console.log(`2nd ${errorFound}`)
+
+        if (errorFound === false) {
+            submitCheckErrorAndRenderSaved()
+        }
+    })
+}
+
+function rememberMainCityApiCall(url) {
+    errorFound = false;
+    fetch(url)
+    .then(function (response) {
+        if (response.ok) {
+            return response.json();
+        } else {
+            errorFound = true;
+            var errorEl = document.createElement('p')
+            $(errorEl).text('Enter Valid City Name')
+            $('#city-weather').append(errorEl);
+            throw new Error('Something went wrong');
+        }
+    })
+    .then (function (data) {
+        console.log(data)
+
+        cityNameAndDate = `${data.name} ${currentDayMonthYear}`;
+        $(cityNameAndDateEl).text(cityNameAndDate);
+        $('#city-weather').append(cityNameAndDateEl);
+
+        iconImgUrl = `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+        iconImgEl.setAttribute('src', iconImgUrl);
+        $('#city-weather').append(iconImgEl);
+
+        cloudCover = data.weather[0].description;
+        $(cloudCoverEl).text(cloudCover);
+        $('#city-weather').append(cloudCoverEl);
+
+        temp = `Temp: ${data.main.temp}°F`;
+        $(tempEl).text(temp);
+        $('#city-weather').append(tempEl);
+
+        wind = `Wind: ${data.wind.speed} MPH`;
+        $(windEl).text(wind);
+        $('#city-weather').append(windEl);
+
+        humidity = `Humidity: ${data.main.humidity}%`;
+        $(humidityEl).text(humidity);
+        $('#city-weather').append(humidityEl);
+    }) 
 }
 
 function fiveDayForecastApiCall(url) {
@@ -263,11 +302,12 @@ function fiveDayForecastApiCall(url) {
 function getLocalStorage() {
     if (localStorage.getItem('cityKeyPair') !== null) {
         console.log(cityKeyPair.length);
-        keys = Object.entries(cityKeyPair)[0];
+        keys = Object.entries(cityKeyPair);
+
         for (var i = 0; i < Object.entries(cityKeyPair).length; i++) {
             var savedOptionEl = document.createElement('p')
             $(savedOptionEl).addClass('saved-btn');
-            var cityText = keys[i];
+            var cityText = keys[i][0];
             $(savedOptionEl).text(cityText);
             $('#saved-searches').append(savedOptionEl);
         }

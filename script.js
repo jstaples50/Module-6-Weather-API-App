@@ -99,16 +99,9 @@ function renderWeather(event) {
 }
 
 function rememberWeather(event) {
-    // if(event.target.textContent !== null)
-
-    // var clickedTarget = event.target.textContent
-
     if(event.target.matches('p')) {
         $('#city-weather').empty();
         $('#five-day-forecast').empty();
-
-        // renderCityName = undefined;
-        
         event.preventDefault();
         console.log('click');
         var rememberCityName = event.target.textContent;

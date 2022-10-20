@@ -1,20 +1,22 @@
 
-#city-weather {
-    border: 2px solid black;
-}
-
 .cloud-cover {
     text-transform: capitalize;
 }
 
-#five-day-forecast {
-    border: 2px solid black;
-}
 
-.saved-btn {
-    border: 1px dashed blue;
+.j-border {
+    border: 2px solid black;
+    border-radius: 20px;
 }
 
 .saved-btn:hover {
     cursor: pointer;
+}
+
+.j-text-color {
+    color: white;
+}
+
+#title {
+    color: white;
 }

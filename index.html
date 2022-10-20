@@ -10,25 +10,27 @@
 </head>
 <body>
     <header>
-        <h1>Weather Dashboard</h1>
+        <h1 class="m-3 p-2 bg-secondary j-text-color j-border">Weather Dashboard</h1>
     </header>
 
-    <div class="city-input-field" >
-        <label for="city-search">Enter City:</label>
-        <input type="text" id="city-search" name="q" placeholder="Enter City">
-        <button id="search-btn">Search</button>
+    <div id="input" class="container d-flex flex-column justify-content-start m-1 p-0">
+        <div class="city-input-field d-flex m-3 justify-content-start" >
+            <label for="city-search" class="m-2">Enter City:</label>
+            <input type="text" id="city-search" name="q" placeholder="Enter City" class="m-2">
+            <button id="search-btn" type="button" class="btn btn-primary m2">Search</button>
+        </div>
+        <div class="state-input-field d-flex m-3 justify-content-start" >
+            <label for="state-search" class="m-2">Enter State:</label>
+            <input list="state-options" id="state-search" class="m-2" name="q" maxlength="2" placeholder="Pick State">
+        </div>
+        <datalist id="state-options"></datalist>
     </div>
-    <div class="state-input-field" >
-        <label for="state-search">Enter State:</label>
-        <input list="state-options" id="state-search" name="q" maxlength="2" placeholder="Pick State">
-    </div>
-    <datalist id="state-options"></datalist>
 
-    <div id="saved-searches"></div>
+    <div id="saved-searches" class="m-1"></div>
 
     <div id="city-weather"></div>
     
-    <div id="five-day-forecast"></div>
+    <div id="five-day-forecast" class="container d-flex justify-content-evenly flex-column m-4 bg-secondary"></div>
 
 
     <script

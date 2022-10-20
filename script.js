@@ -1,15 +1,3 @@
-// GIVEN a weather dashboard with form inputs
-// WHEN I search for a city
-// THEN I am presented with current and future conditions for that city and that city is added to the search history
-// WHEN I view current weather conditions for that city
-// THEN I am presented with the city name, the date, an icon representation of weather conditions, the temperature, the humidity, the wind speed, and the UV index
-// WHEN I view the UV index
-// THEN I am presented with a color that indicates whether the conditions are favorable, moderate, or severe
-// WHEN I view future weather conditions for that city
-// THEN I am presented with a 5-day forecast that displays the date, an icon representation of weather conditions, the temperature, the wind speed, and the humidity
-// WHEN I click on a city in the search history
-// THEN I am again presented with current and future conditions for that city
-
 // **GLOBAL VARIABLES**
 
 var apiKey = '4c8c4f602c00e61fcabd2b0efc3a138f';
@@ -99,7 +87,7 @@ function renderWeather(event) {
 }
 
 function rememberWeather(event) {
-    if(event.target.matches('p')) {
+    if(event.target.matches('button')) {
         $('#city-weather').empty();
         $('#five-day-forecast').empty();
         event.preventDefault();
@@ -107,6 +95,10 @@ function rememberWeather(event) {
         var rememberCityName = event.target.textContent;
         var rememberStateName = cityKeyPair[`${rememberCityName}`][1];
         console.log(rememberStateName);
+
+        var cityWeatherEl = $('#city-weather')
+        $(cityWeatherEl).addClass(['container', 'p-4', 'm-3', 'j-border']);
+        console.log(cityWeatherEl)
 
         var weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${rememberCityName},${rememberStateName},us&units=imperial&appid=${apiKey}`
         var forecastByCityURL =`https://api.openweathermap.org/data/2.5/forecast?q=${rememberCityName},${rememberStateName},us&units=imperial&appid=${apiKey}`
@@ -119,8 +111,8 @@ function rememberWeather(event) {
 }
 
 function submitCheckErrorAndRenderSaved() {
-        var savedOptionEl = document.createElement('p')
-        $(savedOptionEl).addClass('saved-btn');
+        var savedOptionEl = document.createElement('button')
+        $(savedOptionEl).addClass(['saved-btn', 'btn', 'btn-primary', 'm-3']);
         $(savedOptionEl).text(renderCityName);
         $('#saved-searches').append(savedOptionEl);
         cityKeyPair[`${renderCityName}`] = [`${renderCityName}`, `${renderStateName}`];
@@ -138,15 +130,22 @@ function submitMainCityApiCall(url) {
             
             console.log(`1st ${errorFound}`)
 
+            var cityWeatherEl = $('#city-weather')
+            $(cityWeatherEl).addClass(['container', 'p-4', 'm-3']);
+
             var errorEl = document.createElement('p')
             $(errorEl).text('Enter Valid City Name')
             $('#city-weather').append(errorEl);
+            $('#city-weather').addClass('j-border')
             throw new Error('Something went wrong');
         }
     })
     .then (function (data) {
         console.log(data)
 
+        var cityWeatherEl = $('#city-weather')
+        $(cityWeatherEl).addClass(['container', 'p-4', 'm-3', 'j-border']);
+        
         cityNameAndDate = `${data.name} ${currentDayMonthYear}`;
         $(cityNameAndDateEl).text(cityNameAndDate);
         $('#city-weather').append(cityNameAndDateEl);
@@ -190,6 +189,7 @@ function rememberMainCityApiCall(url) {
             var errorEl = document.createElement('p')
             $(errorEl).text('Enter Valid City Name')
             $('#city-weather').append(errorEl);
+            $('#city-weather').addClass('j-border')
             throw new Error('Something went wrong');
         }
     })
@@ -235,7 +235,12 @@ function fiveDayForecastApiCall(url) {
     .then (function (data) {
         var fiveDayForecast = document.createElement('h2');
         $(fiveDayForecast).text('5-Day Forecast');
+        $(fiveDayForecast).addClass(['row', 'm-3', 'j-text-color']);
+        $('#five-day-forecast').addClass('j-border');
         $('#five-day-forecast').append(fiveDayForecast);
+        var dayCardContainer = document.createElement('div');
+        $(dayCardContainer).addClass(['d-flex', 'justify-content-evenly', 'flex-row']);
+        $('#five-day-forecast').append(dayCardContainer);
 
         // Loop to check if data is not today, and if data is for noon
 
@@ -246,8 +251,8 @@ function fiveDayForecastApiCall(url) {
                 console.log(`${dataCheck} ${data.list[i].main}`);
 
                 var dayCard = document.createElement('div');
-                $(dayCard).addClass('card');
-                $('#five-day-forecast').append(dayCard);
+                $(dayCard).addClass(['card', 'd-flex', 'justify-content-evenly', 'mb-4', 'p-2', 'bg-primary', 'j-text-color']);
+                $(dayCardContainer).append(dayCard);
 
                 // Sets the unix variable from data and formats it
 
@@ -298,8 +303,8 @@ function getLocalStorage() {
         keys = Object.entries(cityKeyPair);
 
         for (var i = 0; i < Object.entries(cityKeyPair).length; i++) {
-            var savedOptionEl = document.createElement('p')
-            $(savedOptionEl).addClass('saved-btn');
+            var savedOptionEl = document.createElement('button')
+            $(savedOptionEl).addClass(['saved-btn', 'btn', 'btn-primary', 'm-3']);
             var cityText = keys[i][0];
             $(savedOptionEl).text(cityText);
             $('#saved-searches').append(savedOptionEl);

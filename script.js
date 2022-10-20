@@ -26,9 +26,6 @@ var currentDayMonthYear = moment().format('L');
 var currentDate = moment().format('YYYY-MM-DD');
 var noon = '12:00:00'
 
-// Source for Icons
-// http://openweathermap.org/img/wn/{icon id}@2x.png
-
 var iconImgUrl = '';
 var iconImgEl = document.createElement('img');
 
@@ -53,14 +50,9 @@ var humidityEl = document.createElement('p');
 var renderCityName;
 var renderStateName;
 
-
-// var weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
-
-// var forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
+// Create state datalist
 
 var stateAbbreviations = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
-
-// Create state datalist
 
 for (var i = 0; i < stateAbbreviations.length; i++) {
     var optionEl = document.createElement('option');
@@ -314,15 +306,6 @@ function getLocalStorage() {
 
 // **TESTS**
 
-function locationTest(url) {
-    fetch(url)
-    .then(function (response) {
-        return response.json();
-    })
-    .then (function (data) {
-        console.log(data)
-    })
-}
 
 // **EXECUTION**
 
